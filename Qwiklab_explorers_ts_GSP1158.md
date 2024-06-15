@@ -4,15 +4,45 @@
 
 ### Run the following Commands in CloudShell
 ```
+export REGION=
+```
+```
+#!/bin/bash
+# Define color variables
+
+BLACK=`tput setaf 0`
+RED=`tput setaf 1`
+GREEN=`tput setaf 2`
+YELLOW=`tput setaf 3`
+BLUE=`tput setaf 4`
+MAGENTA=`tput setaf 5`
+CYAN=`tput setaf 6`
+WHITE=`tput setaf 7`
+
+BG_BLACK=`tput setab 0`
+BG_RED=`tput setab 1`
+BG_GREEN=`tput setab 2`
+BG_YELLOW=`tput setab 3`
+BG_BLUE=`tput setab 4`
+BG_MAGENTA=`tput setab 5`
+BG_CYAN=`tput setab 6`
+BG_WHITE=`tput setab 7`
+
+BOLD=`tput bold`
+RESET=`tput sgr0`
+#----------------------------------------------------start--------------------------------------------------#
+
+echo "${BG_MAGENTA}${BOLD}Starting Execution${RESET}"
+
 gcloud services enable dataproc.googleapis.com
 
 gcloud dataplex lakes create ecommerce-lake --location=$REGION --display-name="Ecommerce Lake"
-
 
 gcloud projects add-iam-policy-binding $DEVSHELL_PROJECT_ID \
   --member=user:$USER_EMAIL \
   --role=roles/dataplex.admin
 
+  sleep 30
 
 gcloud dataplex zones create customer-contact-raw-zone \
   --display-name="Customer Contact Raw Zone" \
@@ -20,7 +50,6 @@ gcloud dataplex zones create customer-contact-raw-zone \
   --location=$REGION \
   --resource-location-type=SINGLE_REGION \
   --lake=ecommerce-lake
-
 
 gcloud dataplex assets create contact-info \
 --location=$REGION \
@@ -30,10 +59,6 @@ gcloud dataplex assets create contact-info \
 --resource-type=BIGQUERY_DATASET \
 --resource-name=projects/$DEVSHELL_PROJECT_ID/datasets/customers \
 --discovery-enabled 
-
-
-
-#task 3
 
 cat > dq-customer-raw-data.yaml <<EOF_END
 metadata_registry_defaults:
@@ -83,10 +108,24 @@ rule_bindings:
       - VALID_EMAIL
 EOF_END
 
-
 gsutil cp dq-customer-raw-data.yaml gs://$DEVSHELL_PROJECT_ID-bucket
+
+echo "${YELLOW}${BOLD}NOW${RESET}" "${WHITE}${BOLD}FOLLOW${RESET}" "${GREEN}${BOLD}VIDEO'S INSTRUCTIONS${RESET}"
+
+#-----------------------------------------------------end----------------------------------------------------------#
 ```
-### #Follow the next step carefully from the video solution.
+
+* Go to `BigQuery` from [here](https://console.cloud.google.com/bigquery?)
+
+* In the SQL Editor, click on `Compose a new query`. Paste the following query, and then click `Run`: ( REPLACE PROJECT_ID WITH YOUR PROJECT )
+
+```
+  SELECT * FROM `PROJECT_ID.customers.contact_info`
+  ORDER BY id
+  LIMIT 50
+```
+
+* Go to `Create task` from [here](https://console.cloud.google.com/dataplex/process/create-task/data-quality?) *
 
 # Congratulations ..!! You completed the lab shortly..😃💯
 
